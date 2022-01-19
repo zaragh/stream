@@ -18,10 +18,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
+
                 Surface(color = Color(R.color.red_100)) {
-                            ShowListView()
-                    }
+                    ShowListView()
                 }
             }
         }
     }
+}
+

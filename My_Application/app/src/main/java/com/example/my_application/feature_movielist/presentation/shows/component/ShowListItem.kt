@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,7 @@ import com.example.my_application.feature_movielist.data.Constants.EXPAND_ANIMAT
 import com.example.my_application.feature_movielist.data.Constants.FADE_IN_ANIMATION_DURATION
 import com.example.my_application.feature_movielist.data.Constants.FADE_OUT_ANIMATION_DURATION
 import com.example.my_application.feature_movielist.domain.model.Show
+import com.example.my_application.feature_movielist.presentation.utils.MediumRed
 import okhttp3.HttpUrl
 
 @SuppressLint("UnusedTransitionTargetStateParameter")
@@ -41,12 +43,11 @@ fun ShowListItem(
             targetState = !expanded
         }
     }
-
     val transition = updateTransition(transitionState, label = "")
     val cardBgColor by transition.animateColor({
         tween(durationMillis = EXPAND_ANIMATION_DURATION)
     }, label = "") {
-        if (expanded) Color.Red else Color.Red
+        if (expanded) Color.White else Color.Gray
     }
 
     val cardElevation by transition.animateDp({
@@ -70,7 +71,7 @@ fun ShowListItem(
     ) {
         Card(
             modifier = Modifier
-                .height(200.dp)
+                .height(250.dp)
                 .clickable {
                     isExpanded = !isExpanded
                 },
@@ -79,24 +80,25 @@ fun ShowListItem(
             backgroundColor = cardBgColor
         ) {
 
-            Column {
-                Box {
+            Column(modifier = Modifier.background(Color.LightGray)) {
+                Box() {
                     CardArrow(
                         degrees = arrowRotationDegree,
                         onClick = onCardArrowClick
                     )
 
-                    show.title?.let { CardTitle(title = it ) }
+                    show.title?.let { CardTitle(title = it) }
                 }
                 show.description?.let {
                     val httpUrl = HttpUrl.Builder()
                         .scheme("https")
                         .host("imageproxy.b17g.services")
                         .addPathSegment("convert")
-                        .addQueryParameter("resize", "x150")
+                        .addQueryParameter("resize", "x200")
                         .addQueryParameter("source", show.image)
                         .build()
-                    ExpandableContent(visible = expanded, initialVisibility = expanded,
+                    ExpandableContent(
+                        visible = expanded, initialVisibility = expanded,
                         it, httpUrl
                     )
                 }
@@ -114,11 +116,13 @@ fun CardTitle(title: String) {
         text = title,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(5.dp),
         textAlign = TextAlign.Center,
+        color = Color.Black
     )
 
 }
+
 @Composable
 fun CardArrow(
     degrees: Float,
@@ -135,12 +139,13 @@ fun CardArrow(
         }
     )
 }
+
 @ExperimentalAnimationApi
 @Composable
 fun ExpandableContent(
     visible: Boolean,
     initialVisibility: Boolean = false,
-    showDescription:String, image: HttpUrl
+    showDescription: String, image: HttpUrl
 ) {
     val enterFadeIn = remember {
         fadeIn(
@@ -168,25 +173,34 @@ fun ExpandableContent(
         visible = visible,
         initiallyVisible = initialVisibility,
         enter = enterExpand + enterFadeIn,
-        exit = exitCollapse + exitFadeOut
+        exit = exitCollapse + exitFadeOut,
     ) {
         Column(modifier = Modifier.padding(4.dp)) {
-            Spacer(modifier = Modifier.heightIn(5.dp))
+            Spacer(
+                modifier = Modifier
+                    .heightIn(5.dp)
+                    .background(Color.Red)
+            )
             Text(
+                color = Color.Black,
                 text = showDescription,
                 textAlign = TextAlign.Center
             )
         }
 
     }
-    Button(onClick = { !visible }){
-        Box(modifier = Modifier.height(200.dp)) {
-
+    Button(
+        onClick = { !visible },
+        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
+    ) {
+        Box(modifier = Modifier.height(250.dp)) {
             Image(
                 painter = rememberImagePainter(image),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.LightGray),
+                contentScale = ContentScale.FillBounds
             )
         }
     }
